@@ -1,0 +1,35 @@
+# 1 anchor, 5 aug anchor, 1 other real, 3 vocoded, 3 aug vocoded - with RawBoost only, 1 other spoof
+model:
+  name: wav2vec2_large_vib_gelu_multi
+  flag_fix_ssl: false
+  contra_mode: 'all' # 'one' or 'all'
+  loss_type: 1 # 1: 2loss, 2: loss emb only, 3: loss final hidden state only
+  recon_weight_l: 0.000001
+  recon_weight_b: 0.05
+  ce_loss_weight: 0.5 # weight of the cross entropy loss for bona fide class
+  ssl: 
+    pretrained_path: 'pretrained/xlsr2_300m.pt'
+    num_layers: null
+    order: 'first'
+    custom_order: null
+data:
+  portion: 1 # portion of train/dev data
+  name: ' sasv_sclnormal'
+  kwargs:
+    vocoders: ['hifigan_asvspoof5', 'hn-sinc-nsf-hifi_asvspoof5', 'waveglow_asvspoof5']
+    augmentation_methods: ["RawBoost12", "background_noise_5_15", "librosa_downsample", "mp32flac", "gaussian_1"]
+    num_additional_real: 1
+    num_additional_spoof: 1
+    trim_length: 64600
+    wav_samp_rate: 16000
+    online_aug: true
+    aug_dir: 'DATA/augment'
+    noise_path: '/datab/Dataset/Noise/musan/'
+    rir_path: '/datab/Dataset/Noise/RIRS_NOISES'
+train:
+  max_lr: 1e-5
+  min_lr: 1e-7
+  num_epochs: 20
+  batch_size: 1
+  dev_diff: true
+  save_best: true
